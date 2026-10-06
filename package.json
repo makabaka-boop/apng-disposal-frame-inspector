@@ -1,0 +1,9 @@
+{
+  "name": "apng-frame-inspector",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/",
+    "start": "docker compose up"
+  }
+}

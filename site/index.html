@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>APNG 逐帧检查器（本地）</title>
+<link rel="stylesheet" href="./styles.css">
+</head>
+<body>
+<header>
+  <h1>APNG 逐帧检查器</h1>
+  <p class="sub">全部在浏览器本地解析，文件不会上传。用于定位动画贴纸逐帧覆盖时的清理残影。</p>
+  <p class="note" id="constraint-note"></p>
+</header>
+
+<main>
+  <section id="drop-zone">
+    <p>拖放 APNG 文件到这里，或点击选择文件</p>
+    <input type="file" id="file-input" accept=".png,image/png" hidden>
+    <button id="btn-sample" type="button">没有文件？载入内置示例</button>
+  </section>
+
+  <section id="error-box" hidden>
+    <h2>校验失败</h2>
+    <p id="error-text" class="mono"></p>
+    <p class="warn">已中止渲染：坏块不会回退为静态 PNG 静默显示。</p>
+  </section>
+
+  <section id="report" hidden>
+    <h2>文件信息</h2>
+    <dl id="file-info"></dl>
+
+    <h2>块列表（长度与 CRC 均已校验）</h2>
+    <table id="chunk-table">
+      <thead><tr><th>#</th><th>偏移</th><th>类型</th><th>长度</th><th>CRC</th></tr></thead>
+      <tbody></tbody>
+    </table>
+
+    <section id="static-box" hidden>
+      <h2>静态 PNG</h2>
+      <p>该文件没有 acTL 动画块，是普通静态 PNG，仅显示图像本身。</p>
+      <canvas id="canvas-static" class="checker"></canvas>
+    </section>
+
+    <section id="animation-section" hidden>
+      <div id="default-image-block" hidden>
+        <h2>默认图（静态回退，不属于动画）</h2>
+        <canvas id="canvas-default" class="checker"></canvas>
+      </div>
+
+      <h2>帧列表（点击行跳转）</h2>
+      <table id="frame-table">
+        <thead>
+          <tr><th>帧</th><th>偏移</th><th>尺寸</th><th>延迟</th><th>dispose</th><th>blend</th><th>数据</th><th>字节</th></tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <div id="controls">
+        <button id="btn-prev" type="button">◀ 上一帧</button>
+        <span id="frame-indicator"></span>
+        <button id="btn-next" type="button">下一帧 ▶</button>
+        <label>跳到 <input type="number" id="frame-jump" min="1" value="1"> 帧</label>
+        <button id="btn-jump" type="button">跳转</button>
+        <button id="btn-download" type="button">下载当前合成帧 PNG</button>
+      </div>
+      <p id="frame-meta" class="mono"></p>
+
+      <div id="stages">
+        <figure>
+          <figcaption>帧前画布（绘制前）</figcaption>
+          <canvas id="canvas-before" class="checker"></canvas>
+        </figure>
+        <figure>
+          <figcaption>展示后画布（SOURCE/OVER 合成结果）</figcaption>
+          <canvas id="canvas-display" class="checker"></canvas>
+        </figure>
+        <figure>
+          <figcaption>清理后画布（NONE/BACKGROUND/PREVIOUS）</figcaption>
+          <canvas id="canvas-after" class="checker"></canvas>
+        </figure>
+        <figure>
+          <figcaption>当前帧源图（局部矩形，未合成）</figcaption>
+          <canvas id="canvas-raw" class="checker"></canvas>
+        </figure>
+      </div>
+      <p id="pixel-readout" class="mono"></p>
+      <p class="note">帧状态在载入时一次性预计算，前进 / 后退 / 任意跳转读取同一组快照，任何访问顺序像素都一致。</p>
+    </section>
+  </section>
+</main>
+
+<script type="module" src="./js/app.js"></script>
+</body>
+</html>
