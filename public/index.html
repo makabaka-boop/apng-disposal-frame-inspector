@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>本地 APNG 贴纸检查页</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header>
+    <h1>本地 APNG 贴纸检查页</h1>
+    <p class="subtitle">
+      文件仅由浏览器在本机读取，不上传、不实时播放。限制：RGBA8、非隔行、无颜色管理扩展；
+      画布 ≤ 64×64、≤ 16 帧、文件 ≤ 64 KiB。
+    </p>
+  </header>
+
+  <main>
+    <section class="panel import-panel">
+      <label id="drop-zone" for="file-input">
+        <input id="file-input" type="file" accept="image/png,.png">
+        <span class="drop-title">选择或拖入 APNG / PNG</span>
+        <span class="drop-hint">坏块会明确报错，不会静默作为静态 PNG 降级。</span>
+      </label>
+      <button id="run-tests" type="button">运行独立像素与真实文件自检</button>
+      <div id="test-output" class="test-output" aria-live="polite"></div>
+    </section>
+
+    <p id="status" class="status" aria-live="polite"></p>
+    <div id="error" class="error" role="alert" hidden></div>
+
+    <section class="grid two-column">
+      <section class="panel">
+        <h2>文件与结构</h2>
+        <table id="file-meta" class="meta"></table>
+      </section>
+      <section class="panel">
+        <h2>当前帧参数</h2>
+        <table id="frame-info" class="meta"></table>
+      </section>
+    </section>
+
+    <section class="panel navigation" id="navigation" hidden>
+      <h2>逐帧检查</h2>
+      <div class="controls">
+        <button id="previous-frame" type="button">← 后退</button>
+        <label class="jump">跳到
+          <select id="frame-select"></select>
+        </label>
+        <button id="next-frame" type="button">前进 →</button>
+        <button id="download-frame" type="button" class="primary">下载当前合成帧（完整画布）</button>
+      </div>
+    </section>
+
+    <section class="canvas-grid">
+      <article class="panel canvas-panel">
+        <h2>局部原始帧</h2>
+        <canvas id="source-canvas" width="1" height="1"></canvas>
+        <p>仅展示当前帧自己的 RGBA 矩形，不参与下载。</p>
+      </article>
+      <article class="panel canvas-panel">
+        <h2>帧前画布（PRE）</h2>
+        <canvas id="pre-canvas" width="1" height="1"></canvas>
+        <p>当前帧绘制前的完整画布；PREVIOUS 恢复这个矩形。</p>
+      </article>
+      <article class="panel canvas-panel">
+        <h2>展示后画布（POST）</h2>
+        <canvas id="post-canvas" width="1" height="1"></canvas>
+        <p>SOURCE/OVER 合成后的当前帧展示结果，也是下载内容。</p>
+      </article>
+      <article class="panel canvas-panel">
+        <h2>清理后画布（CLEANED）</h2>
+        <canvas id="cleaned-canvas" width="1" height="1"></canvas>
+        <p>NONE / BACKGROUND / PREVIOUS 之后传给下一帧的状态。</p>
+      </article>
+    </section>
+
+    <section class="panel">
+      <h2>真实 PNG 块顺序、长度、CRC 与动画序号</h2>
+      <ul id="timeline" class="chunks"></ul>
+    </section>
+  </main>
+
+  <footer>
+    APNG 时间轴由本页自行合成；只把每帧拆成普通 PNG 后交给浏览器成熟 PNG 解码器读取像素。
+  </footer>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

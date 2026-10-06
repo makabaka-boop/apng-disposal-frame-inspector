@@ -1,0 +1,19 @@
+services:
+  apng-checker:
+    image: nginx:1.27-alpine
+    # 只托管只读静态文件；没有应用后端，文件不会离开浏览器。
+    # 以镜像内置的非特权 nginx 用户运行（uid/gid 101）。
+    user: "101:101"
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:size=8m,mode=0777
+      - /var/run:size=1m,mode=0777
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./public:/usr/share/nginx/html:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
